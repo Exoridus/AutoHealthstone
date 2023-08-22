@@ -11,7 +11,7 @@ local macroTemplate = [[
 /use item:%d
 ]];
 
-Addon = AceAddon:NewAddon(Addon, AddonName, "AceEvent-3.0", "AceConsole-3.0");
+Addon = AceAddon:NewAddon(Addon, AddonName, "AceEvent-3.0", "AceConsole-3.0", "LibAboutPanel-2.0");
 
 Addon.defaults = {
   profile = {
@@ -29,17 +29,28 @@ Addon.options = {
       order = 1.0,
       type = "input",
       name = "Macro Name",
-      desc = "Macro Name.",
       get = "OptsGetter",
-      set = "OptsSetter",
+      set = function(_, value)
+        local prevName = Addon.conf.macroName;
+
+        Addon.conf.macroName = strsub(strtrim(value or ""), 1, 16);
+
+        if Addon.conf.macroName ~= prevName and GetMacroInfo(prevName) then
+          DeleteMacro(prevName);
+        end
+
+        Addon:UpdateMacro();
+      end,
     },
     preferNightmareSeeds = {
       type = "toggle",
       order = 1.1,
-      name = "Prefer Nightmare Seed",
-      desc = "Prefer Nightmare Seed.",
+      name = "Prefer Nightmare Seeds",
       get = "OptsGetter",
-      set = "OptsSetter",
+      set = function(_, value)
+        Addon.conf.preferNightmareSeeds = value;
+        Addon:UpdateMacro();
+      end
     },
   },
 };
@@ -52,16 +63,19 @@ function Addon:OnInitialize()
     __newindex = self.db.profile,
   });
 
-  self.options.args.profiles = AceDBOptions:GetOptionsTable(self.db);
-
   AceConfig:RegisterOptionsTable(AddonName, self.options);
-  AceConfigDialog:AddToBlizOptions(AddonName, AddonName);
+  self.optionsFrame = AceConfigDialog:AddToBlizOptions(AddonName, AddonName);
+
+  AceConfig:RegisterOptionsTable(AddonName.."_Profiles", AceDBOptions:GetOptionsTable(self.db));
+  AceConfigDialog:AddToBlizOptions(AddonName.."_Profiles", "Profiles", AddonName);
+
+  AceConfig:RegisterOptionsTable(AddonName.."_About", self:AboutOptionsTable(AddonName));
+  AceConfigDialog:AddToBlizOptions(AddonName.."_About", "About", AddonName);
 end
 
 function Addon:OnEnable()
   self:RegisterEvent("PLAYER_ENTERING_WORLD");
-  self:RegisterEvent("BAG_NEW_ITEMS_UPDATED");
-  self:RegisterEvent("UNIT_INVENTORY_CHANGED");
+  self:RegisterEvent("BAG_UPDATE_DELAYED");
 
   self:RegisterChatCommand("autohealthstone", "OnChatCommand");
   self:RegisterChatCommand("ah", "OnChatCommand");
@@ -69,8 +83,7 @@ end
 
 function Addon:OnDisable()
   self:UnregisterEvent("PLAYER_ENTERING_WORLD");
-  self:UnregisterEvent("BAG_NEW_ITEMS_UPDATED");
-  self:UnregisterEvent("UNIT_INVENTORY_CHANGED");
+  self:UnregisterEvent("BAG_UPDATE_DELAYED");
 
   self:UnregisterChatCommand("autohealthstone");
   self:UnregisterChatCommand("ah");
@@ -86,13 +99,7 @@ function Addon:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
   end
 end
 
-function Addon:UNIT_INVENTORY_CHANGED(event, unit)
-  if unit == "player" then
-    self:UpdateMacro(event);
-  end
-end
-
-function Addon:BAG_NEW_ITEMS_UPDATED(event)
+function Addon:BAG_UPDATE_DELAYED(event)
   self:UpdateMacro(event);
 end
 
@@ -107,8 +114,6 @@ function Addon:UpdateMacro(event)
     return;
   end
 
-  self:Print(event)
-
   local macroName = self.conf.macroName;
   local macroText = format(macroTemplate, itemID);
   local name, _, body = GetMacroInfo(macroName);
@@ -117,8 +122,6 @@ function Addon:UpdateMacro(event)
     CreateMacro(macroName, 134400, macroText, false);
   elseif body ~= macroText then
     EditMacro(macroName, nil, nil, macroText);
-  else
-    self:Print("update skipped");
   end
 end
 
@@ -136,8 +139,4 @@ end
 
 function Addon:OptsGetter(info)
   return self.conf[info[#info]];
-end
-
-function Addon:OptsSetter(info, value)
-  self.conf[info[#info]] = value;
 end
