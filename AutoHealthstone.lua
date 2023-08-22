@@ -93,17 +93,17 @@ function Addon:OnChatCommand()
   Settings.OpenToCategory(AddonName);
 end
 
-function Addon:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+function Addon:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
   if isLogin or isReload then
-    self:UpdateMacro(event);
+    self:UpdateMacro();
   end
 end
 
-function Addon:BAG_UPDATE_DELAYED(event)
-  self:UpdateMacro(event);
+function Addon:BAG_UPDATE_DELAYED()
+  self:UpdateMacro();
 end
 
-function Addon:UpdateMacro(event)
+function Addon:UpdateMacro()
   if InCombatLockdown() then
     return;
   end
