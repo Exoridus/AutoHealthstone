@@ -10,6 +10,7 @@
 ## X-Embeds: LibStub, Ace3
 ## X-Category: Interface Enhancements
 ## X-Curse-Project-ID: 905401
+## X-WoWI-ID: 26624
 ## X-Wago-ID: 56n9baN9
 
 embeds.xml
