@@ -24,7 +24,8 @@ jobs:
           annotate: warning
 
       - name: Generate Changelog
-        run: .github/generate_changelog.sh
+        run: ./.github/scripts/generate_changelog.sh
+        shell: bash
         if: github.ref_type == 'tag'
 
       - name: Package and release
