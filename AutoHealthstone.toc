@@ -1,0 +1,18 @@
+## Interface: 30402
+## Title: AutoHealthstone |cFF00FF00v@project-version@|r
+## Notes: AutoHealthstone
+## Author: Exoridus
+## Version: @project-version@
+## SavedVariables: AutoHealthstoneDB
+## RequiredDeps: Scambuster
+## OptionalDeps: Ace3, AceGUI-3.0_SFX-Widgets
+## DefaultState: enabled
+## LoadManagers: AddonLoader
+## X-LoadOn-Realm: Venoxis
+## X-License: GPLv3
+## X-Embeds: LibStub, Ace3, AceGUI-3.0_SFX-Widgets
+## X-Category: Chat/Communication
+
+embeds.xml
+
+AutoHealthstone.lua

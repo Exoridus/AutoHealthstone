@@ -1,0 +1,8 @@
+.env
+.idea
+.vscode
+.release
+.install
+.lua
+.luarocks
+CHANGELOG.md

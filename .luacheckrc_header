@@ -1,0 +1,17 @@
+std = "lua51"
+codes = true
+include_files = {
+	"**/*.lua",
+	".luacheckrc",
+}
+exclude_files = {
+	"**/Libs/",
+	".*/",
+}
+ignore = {
+	"122/StaticPopupDialogs", -- Setting a read-only field of a global variable.
+	"212/self", -- Unused argument.
+	"631", -- Line is too long.
+}
+max_cyclomatic_complexity = 10
+globals = {}
