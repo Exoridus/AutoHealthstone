@@ -3,6 +3,7 @@ local AceAddon = LibStub("AceAddon-3.0");
 local AceConfig = LibStub("AceConfig-3.0");
 local AceConfigDialog = LibStub("AceConfigDialog-3.0");
 local AceDB = LibStub("AceDB-3.0");
+local AceDBOptions = LibStub("AceDBOptions-3.0");
 local healthstoneIDs = { 36894, 36893, 36892, 36891, 36890, 36889, 22105, 22104, 22103 };
 local nightmareSeedID = 22797;
 local macroTemplate = [[
@@ -10,7 +11,7 @@ local macroTemplate = [[
 /use item:%d
 ]];
 
-Addon = AceAddon:NewAddon(Addon, AddonName, "AceEvent-3.0");
+Addon = AceAddon:NewAddon(Addon, AddonName, "AceEvent-3.0", "AceConsole-3.0");
 
 Addon.defaults = {
   profile = {
@@ -46,45 +47,83 @@ Addon.options = {
 function Addon:OnInitialize()
   self.db = AceDB:New(AddonName.."DB", self.defaults, true);
 
-  self.opts = setmetatable({}, {
+  self.conf = setmetatable({}, {
     __index = self.db.profile,
     __newindex = self.db.profile,
   });
 
+  self.options.args.profiles = AceDBOptions:GetOptionsTable(self.db);
+
   AceConfig:RegisterOptionsTable(AddonName, self.options);
-  AceConfigDialog:AddToBlizOptions(AddonName, AddonName, {"/autohealthstone", "/ah"});
+  AceConfigDialog:AddToBlizOptions(AddonName, AddonName);
 end
 
 function Addon:OnEnable()
+  self:RegisterEvent("PLAYER_ENTERING_WORLD");
+  self:RegisterEvent("BAG_NEW_ITEMS_UPDATED");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
+
+  self:RegisterChatCommand("autohealthstone", "OnChatCommand");
+  self:RegisterChatCommand("ah", "OnChatCommand");
 end
 
 function Addon:OnDisable()
+  self:UnregisterEvent("PLAYER_ENTERING_WORLD");
+  self:UnregisterEvent("BAG_NEW_ITEMS_UPDATED");
   self:UnregisterEvent("UNIT_INVENTORY_CHANGED");
+
+  self:UnregisterChatCommand("autohealthstone");
+  self:UnregisterChatCommand("ah");
 end
 
-function Addon:UNIT_INVENTORY_CHANGED(_, unit)
-  if InCombatLockdown() or unit ~= "player" then
+function Addon:OnChatCommand()
+  Settings.OpenToCategory(AddonName);
+end
+
+function Addon:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+  if isLogin or isReload then
+    self:UpdateMacro(event);
+  end
+end
+
+function Addon:UNIT_INVENTORY_CHANGED(event, unit)
+  if unit == "player" then
+    self:UpdateMacro(event);
+  end
+end
+
+function Addon:BAG_NEW_ITEMS_UPDATED(event)
+  self:UpdateMacro(event);
+end
+
+function Addon:UpdateMacro(event)
+  if InCombatLockdown() then
     return;
   end
 
   local itemID = self:GetUsableItem();
 
-  if itemID then
-    local macroName = self.opts.macroName;
-    local macroText = macroTemplate:format(itemID);
-    local name, _, body = GetMacroInfo(macroName);
+  if not itemID then
+    return;
+  end
 
-    if not name then
-      CreateMacro(macroName, nil, macroText);
-    elseif body ~= macroText then
-      EditMacro(macroName, nil, nil, macroText);
-    end
+  self:Print(event)
+
+  local macroName = self.conf.macroName;
+  local macroText = format(macroTemplate, itemID);
+  local name, _, body = GetMacroInfo(macroName);
+
+  if not name then
+    CreateMacro(macroName, 134400, macroText, false);
+  elseif body ~= macroText then
+    EditMacro(macroName, nil, nil, macroText);
+  else
+    self:Print("update skipped");
   end
 end
 
 function Addon:GetUsableItem()
-  if self.opts.preferNightmareSeeds and GetItemCount(nightmareSeedID, false) > 0 then
+  if self.conf.preferNightmareSeeds and GetItemCount(nightmareSeedID, false) > 0 then
     return nightmareSeedID;
   end
 
@@ -96,9 +135,9 @@ function Addon:GetUsableItem()
 end
 
 function Addon:OptsGetter(info)
-  return self.opts[info[#info]];
+  return self.conf[info[#info]];
 end
 
 function Addon:OptsSetter(info, value)
-  self.opts[info[#info]] = value;
+  self.conf[info[#info]] = value;
 end

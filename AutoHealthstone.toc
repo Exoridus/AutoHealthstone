@@ -1,17 +1,16 @@
 ## Interface: 30402
 ## Title: AutoHealthstone |cFF00FF00v@project-version@|r
-## Notes: AutoHealthstone
+## Notes: Provides a macro that updates to the current healthstone in your bags.
 ## Author: Exoridus
 ## Version: @project-version@
 ## SavedVariables: AutoHealthstoneDB
-## RequiredDeps: Scambuster
-## OptionalDeps: Ace3, AceGUI-3.0_SFX-Widgets
+## OptionalDeps: Ace3
 ## DefaultState: enabled
-## LoadManagers: AddonLoader
-## X-LoadOn-Realm: Venoxis
 ## X-License: GPLv3
-## X-Embeds: LibStub, Ace3, AceGUI-3.0_SFX-Widgets
-## X-Category: Chat/Communication
+## X-Embeds: LibStub, Ace3
+## X-Category: Interface Enhancements
+## X-Curse-Project-ID: 905401
+## X-Wago-ID: 56n9baN9
 
 embeds.xml
 
