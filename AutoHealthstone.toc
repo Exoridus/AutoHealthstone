@@ -8,7 +8,7 @@
 ## DefaultState: enabled
 ## X-License: GPLv3
 ## X-Embeds: LibStub, Ace3
-## X-Category: Interface Enhancements
+## X-Category: Actions Bars
 ## X-Curse-Project-ID: 905401
 ## X-WoWI-ID: 26624
 ## X-Wago-ID: 56n9baN9
