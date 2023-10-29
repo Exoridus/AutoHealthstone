@@ -4,16 +4,14 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/lint.yml@main
   deploy:
     needs: lint
+    uses: ./.github/workflows/deploy.yml@main
     environment: production
-    uses: ./.github/workflows/deploy.yml
     secrets: inherit
   status:
     needs: [lint, deploy]
     if: ${{ failure() }}
-    uses: ./.github/workflows/status.yml
-    with:
-      status: ${{ job.status }}
+    uses: ./.github/workflows/status.yml@main
     secrets: inherit
