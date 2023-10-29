@@ -2,13 +2,10 @@ name: Status
 
 on:
   workflow_call:
-    secrets:
-      WEBHOOK_URL:
-        required: true
     inputs:
       status:
         type: string
-        default: failure
+        required: true
 
 jobs:
   status:

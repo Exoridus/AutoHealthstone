@@ -8,10 +8,9 @@ jobs:
   deploy:
     needs: lint
     uses: ./.github/workflows/deploy.yml
-    environment: production
-    secrets: inherit
   status:
     needs: [lint, deploy]
     if: ${{ failure() }}
     uses: ./.github/workflows/status.yml
-    secrets: inherit
+    with:
+      status: ${{ job.status }}
