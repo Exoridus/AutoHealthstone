@@ -20,6 +20,7 @@ jobs:
           annotate: warning
 
   package_and_release:
+    if: ${{ github.ref_type == 'tag' }}
     needs: lint_code
     runs-on: ubuntu-latest
     environment: production
@@ -42,8 +43,8 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
 
   notify_failures:
-    needs: [lint_code, package_and_release]
     if: ${{ failure() }}
+    needs: [lint_code, package_and_release]
     runs-on: ubuntu-latest
     steps:
       - name: Send Status to Discord
