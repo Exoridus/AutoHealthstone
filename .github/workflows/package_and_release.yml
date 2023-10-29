@@ -3,9 +3,8 @@ name: Package and release
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  lint:
+  lint_code:
     runs-on: ubuntu-latest
-    needs: checkout
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,10 +15,11 @@ jobs:
           args: --no-color
           annotate: warning
 
-  deploy:
-    needs: lint
+  package_and_release:
+    needs: lint_code
     runs-on: ubuntu-latest
     environment: production
+    concurrency: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
           WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
 
   notify_failures:
-    needs: [lint, deploy]
+    needs: [lint_code, package_and_release]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     steps:
