@@ -1,0 +1,13 @@
+name: Changelog
+
+on: workflow_call
+
+jobs:
+  checkout:
+    uses: ./.github/workflows/checkout.yml
+  changelog:
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
+      - run: ./.github/scripts/generate_changelog.sh
+        shell: bash

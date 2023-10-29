@@ -1,0 +1,15 @@
+name: Lint
+
+on: workflow_call
+
+jobs:
+  checkout:
+    uses: ./.github/workflows/checkout.yml
+  lint:
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
+      - uses: nebularg/actions-luacheck@v1
+        with:
+          args: --no-color
+          annotate: warning
