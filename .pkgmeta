@@ -1,7 +1,5 @@
 package-as: AutoHealthstone
 
-enable-nolib-creation: no
-
 ignore:
   - README.md
   - LICENSE
