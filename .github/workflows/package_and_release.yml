@@ -13,4 +13,4 @@ jobs:
     if: ${{ failure() }}
     uses: ./.github/workflows/status.yml
     with:
-      status: ${{ job.status }}
+      status: failure
