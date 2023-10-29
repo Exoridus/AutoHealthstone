@@ -1,6 +1,14 @@
 name: Deploy
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+      WOWI_API_TOKEN:
+        required: true
+      WAGO_API_TOKEN:
+        required: true
 
 jobs:
   changelog:
@@ -8,9 +16,9 @@ jobs:
   deploy:
     needs: changelog
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - uses: BigWigsMods/packager@v2
+      - name: Package and release
+        uses: BigWigsMods/packager@v2
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
