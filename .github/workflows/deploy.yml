@@ -12,7 +12,7 @@ on:
 
 jobs:
   changelog:
-    uses: ./.github/workflows/changelog.yml@main
+    uses: ./.github/workflows/changelog.yml
   deploy:
     needs: changelog
     runs-on: ubuntu-latest
